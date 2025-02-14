@@ -16,5 +16,22 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        if(checkLocationPermission()) {
+            getUserLocation()
+        } else {
+            requestLocationPermission()
+        }
+    }
+
+    private fun getUserLocation() {
+        TODO("Not yet implemented")
+    }
+
+    private fun requestLocationPermission() {
+        TODO("Not yet implemented")
+    }
+
+    private fun checkLocationPermission(): Boolean {
+        TODO("Not yet implemented")
     }
 }
