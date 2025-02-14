@@ -13,7 +13,7 @@ This project is currently in early development. Features will be added.
 ## Setup & Installation  
 1. Clone the repository:  
    ```sh
-   git clone https://github.com/YOUR_GITHUB_USERNAME/GeoCipher.git
+   git clone https://github.com/fahretf/GeoCipher.git
 
 ## Roadmap
 
