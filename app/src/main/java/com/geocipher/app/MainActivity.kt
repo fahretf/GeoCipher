@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var textViewLat: TextView
     private lateinit var textViewLong: TextView
+    private lateinit var locationCallback: LocationCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,18 +52,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     private fun getUserLocation() {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0)
-            .setMaxUpdates(1)
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
             .build()
 
-        val locationCallback = object : LocationCallback() {
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.lastLocation
 
                 textViewLat.text = location?.latitude.toString()
                 textViewLong.text = location?.longitude.toString()
-                fusedLocationClient.removeLocationUpdates(this)
             }
         }
 
@@ -77,9 +77,11 @@ class MainActivity : AppCompatActivity() {
             requestLocationPermission();
             return
         }
-        fusedLocationClient.requestLocationUpdates(locationRequest,
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
             locationCallback,
-            Looper.getMainLooper())
+            Looper.getMainLooper()
+        )
     }
 
     private fun requestLocationPermission() {
@@ -127,9 +129,18 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getUserLocation()
             } else {
-                Toast.makeText(this, "Permission denied. Go to settings  to enable location.", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    "Permission denied. Go to settings  to enable location.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
 }
