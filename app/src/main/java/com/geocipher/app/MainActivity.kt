@@ -138,8 +138,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
