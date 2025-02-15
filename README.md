@@ -11,7 +11,7 @@ This project is currently in early development. Existing features:
 ## Tech Stack  
 - **Kotlin**  
 - **AES-256 Encryption** *(to be implemented)*  
-- **GPS-based location tracking** *(in progress)*
+- **GPS-based location tracking**
 - **Firebase as a database**
 
 ## Setup & Installation  
