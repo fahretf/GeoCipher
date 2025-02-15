@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                 val location = result.lastLocation
                 if(location == null) {
                     Toast.makeText(
-                        this,
+                        this@MainActivity,
                         "No available GPS data",
                         Toast.LENGTH_LONG
                     ).show()
