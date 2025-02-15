@@ -6,12 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.location.Location
+import android.location.LocationManager
 import android.os.Looper
 import android.widget.TextView
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -45,6 +47,15 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         if (checkLocationPermission()) {
+            val mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            if(!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+
+                Toast.makeText(
+                    this,
+                    "You need to turn on Location services for this app to work.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
             getUserLocation()
         } else {
             requestLocationPermission()
@@ -60,6 +71,13 @@ class MainActivity : AppCompatActivity() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.lastLocation
+                if(location == null) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "No available GPS data",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
 
                 textViewLat.text = location?.latitude.toString()
                 textViewLong.text = location?.longitude.toString()
