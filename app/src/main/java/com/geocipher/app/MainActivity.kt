@@ -23,6 +23,20 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.gms.location.Priority
+import java.util.UUID
+import com.google.crypto.tink.Config
+import com.google.crypto.tink.aead.AeadConfig
+import com.google.crypto.tink.Aead
+import com.google.crypto.tink.CleartextKeysetHandle
+import com.google.crypto.tink.JsonKeysetReader
+import com.google.crypto.tink.KeysetHandle
+import javax.crypto.Mac
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
+import com.google.crypto.tink.aead.AeadKeyTemplates
+import android.util.Base64
+import java.security.MessageDigest
+import javax.crypto.spec.GCMParameterSpec
 
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
@@ -50,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         if (checkLocationPermission()) {
             val mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            if(!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 
                 Toast.makeText(
                     this,
@@ -63,7 +77,9 @@ class MainActivity : AppCompatActivity() {
             requestLocationPermission()
         }
         db = FirebaseFirestore.getInstance()
+        AeadConfig.register()
         testFirestoreConnection()
+        testEncryption()
 
     }
 
@@ -82,6 +98,58 @@ class MainActivity : AppCompatActivity() {
                 Log.w("Firestore", "Error adding document", e)
             }
     }
+
+    private fun addMessage(message: String, key: String, latitude: Double, longitude: Double) {
+        val id = UUID.randomUUID().toString();
+        val encryptedMessage = encryptMessage(message, key)
+
+        val doc = hashMapOf(
+            "id" to id,
+            "encrypted_msg" to encryptedMessage,
+            "latitude" to latitude,
+            "longitude" to longitude,
+        )
+        db.collection("messages").add(doc)
+    }
+
+    private fun retrieveMessage(key: String, latitude: Double, longitude: Double) {
+        TODO()
+    }
+
+    private fun encryptMessage(plaintext: String, userKey: String): String {
+        val secretKey = SecretKeySpec(deriveKey(userKey), "AES")
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+        val iv = cipher.iv
+        val ciphertext = cipher.doFinal(plaintext.toByteArray())
+        val combined = ByteArray(iv.size + ciphertext.size)
+        System.arraycopy(iv, 0, combined, 0, iv.size)
+        System.arraycopy(ciphertext, 0, combined, iv.size, ciphertext.size)
+        return Base64.encodeToString(combined, Base64.NO_WRAP)
+    }
+
+
+    private fun deriveKey(userKey: String): ByteArray {
+        val mac = Mac.getInstance("HmacSHA256")
+        val secretKey = SecretKeySpec(userKey.toByteArray(), "HmacSHA256")
+        mac.init(secretKey)
+        return mac.doFinal("someSalt".toByteArray()).copyOf(32)
+    }
+
+
+    private fun decryptMessage(encryptedMessage: String, userKey: String): String {
+        val combined = Base64.decode(encryptedMessage, Base64.NO_WRAP)
+        val ivSize = 12
+        val iv = combined.copyOfRange(0, ivSize)
+        val ciphertext = combined.copyOfRange(ivSize, combined.size)
+        val secretKey = SecretKeySpec(deriveKey(userKey), "AES")
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
+        val decrypted = cipher.doFinal(ciphertext)
+        return String(decrypted)
+    }
+
+
     private fun getUserLocation() {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
             .build()
@@ -89,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.lastLocation
-                if(location == null) {
+                if (location == null) {
                     Toast.makeText(
                         this@MainActivity,
                         "No available GPS data",
@@ -172,6 +240,15 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         }
+    }
+
+    private fun testEncryption() {
+        val enkriptovanaPoruka = encryptMessage("Fahret", "qwert678")
+        val dekriptovanaPoruka = decryptMessage(enkriptovanaPoruka, "qwert678")
+
+        Log.d("CRYPT: ", "Enkriptovana poruka: $enkriptovanaPoruka")
+        Log.d("CRYPT: ", "Dekriptovana poruka: $dekriptovanaPoruka")
+
     }
 
     override fun onPause() {
