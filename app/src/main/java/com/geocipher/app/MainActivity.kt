@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun testFirestoreConnection() {
         val testDoc = hashMapOf(
-            "message" to "GULAR",
+            "message" to "MESSAGE",
             "timestamp" to System.currentTimeMillis()
         )
 
