@@ -30,9 +30,13 @@ import com.google.crypto.tink.Aead
 import com.google.crypto.tink.CleartextKeysetHandle
 import com.google.crypto.tink.JsonKeysetReader
 import com.google.crypto.tink.KeysetHandle
+import javax.crypto.Mac
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
 import com.google.crypto.tink.aead.AeadKeyTemplates
-import com.google.crypto.tink.subtle.Base64
+import android.util.Base64
 import java.security.MessageDigest
+import javax.crypto.spec.GCMParameterSpec
 
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
@@ -112,32 +116,37 @@ class MainActivity : AppCompatActivity() {
         TODO()
     }
 
-    private fun encryptMessage(message: String, userKey: String): String {
-        AeadConfig.register()
-
-        val derivedKey =
-            MessageDigest.getInstance("SHA-256").digest(userKey.toByteArray()).copyOf(32)
-
-        val keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withBytes(derivedKey))
-
-        val aead: Aead = keysetHandle.getPrimitive(Aead::class.java)
-
-        val ciphertext: ByteArray = aead.encrypt(message.toByteArray(), null)
-
-        return Base64.encodeToString(ciphertext, Base64.NO_WRAP)
+    private fun encryptMessage(plaintext: String, userKey: String): String {
+        val secretKey = SecretKeySpec(deriveKey(userKey), "AES")
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+        val iv = cipher.iv
+        val ciphertext = cipher.doFinal(plaintext.toByteArray())
+        val combined = ByteArray(iv.size + ciphertext.size)
+        System.arraycopy(iv, 0, combined, 0, iv.size)
+        System.arraycopy(ciphertext, 0, combined, iv.size, ciphertext.size)
+        return Base64.encodeToString(combined, Base64.NO_WRAP)
     }
 
 
-    fun decryptMessage(encryptedMessage: String, userKey: String): String {
-        val derivedKey =
-            MessageDigest.getInstance("SHA-256").digest(userKey.toByteArray()).copyOf(32)
+    private fun deriveKey(userKey: String): ByteArray {
+        val mac = Mac.getInstance("HmacSHA256")
+        val secretKey = SecretKeySpec(userKey.toByteArray(), "HmacSHA256")
+        mac.init(secretKey)
+        return mac.doFinal("someSalt".toByteArray()).copyOf(32)
+    }
 
-        val keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withBytes(derivedKey))
-        val aead: Aead = keysetHandle.getPrimitive(Aead::class.java)
 
-        val ciphertext: ByteArray = Base64.decode(encryptedMessage, Base64.NO_WRAP)
-
-        return String(aead.decrypt(ciphertext, null))
+    private fun decryptMessage(encryptedMessage: String, userKey: String): String {
+        val combined = Base64.decode(encryptedMessage, Base64.NO_WRAP)
+        val ivSize = 12
+        val iv = combined.copyOfRange(0, ivSize)
+        val ciphertext = combined.copyOfRange(ivSize, combined.size)
+        val secretKey = SecretKeySpec(deriveKey(userKey), "AES")
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
+        val decrypted = cipher.doFinal(ciphertext)
+        return String(decrypted)
     }
 
 
