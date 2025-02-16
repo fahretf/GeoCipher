@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1019120344071",
+    "project_id": "geocipher-13737",
+    "storage_bucket": "geocipher-13737.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019120344071:android:41708bf2647b4afa739ea2",
+        "android_client_info": {
+          "package_name": "com.geocipher.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA61-KllhuGOb1JQXg2md8u7-BXZtAoHgs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
