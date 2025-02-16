@@ -21,6 +21,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.gms.location.Priority
 
 
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewLat: TextView
     private lateinit var textViewLong: TextView
     private lateinit var locationCallback: LocationCallback
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,10 +62,26 @@ class MainActivity : AppCompatActivity() {
         } else {
             requestLocationPermission()
         }
+        db = FirebaseFirestore.getInstance()
+        testFirestoreConnection()
 
     }
 
+    private fun testFirestoreConnection() {
+        val testDoc = hashMapOf(
+            "message" to "MESSAGE",
+            "timestamp" to System.currentTimeMillis()
+        )
 
+        db.collection("testCollection")
+            .add(testDoc)
+            .addOnSuccessListener { documentReference ->
+                Log.d("Firestore", "Document added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w("Firestore", "Error adding document", e)
+            }
+    }
     private fun getUserLocation() {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
             .build()
