@@ -23,6 +23,16 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.gms.location.Priority
+import java.util.UUID
+import com.google.crypto.tink.Config
+import com.google.crypto.tink.aead.AeadConfig
+import com.google.crypto.tink.Aead
+import com.google.crypto.tink.CleartextKeysetHandle
+import com.google.crypto.tink.JsonKeysetReader
+import com.google.crypto.tink.KeysetHandle
+import com.google.crypto.tink.aead.AeadKeyTemplates
+import com.google.crypto.tink.subtle.Base64
+import java.security.MessageDigest
 
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
@@ -50,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         if (checkLocationPermission()) {
             val mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            if(!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 
                 Toast.makeText(
                     this,
@@ -63,7 +73,9 @@ class MainActivity : AppCompatActivity() {
             requestLocationPermission()
         }
         db = FirebaseFirestore.getInstance()
+        AeadConfig.register()
         testFirestoreConnection()
+        testEncryption()
 
     }
 
@@ -82,6 +94,53 @@ class MainActivity : AppCompatActivity() {
                 Log.w("Firestore", "Error adding document", e)
             }
     }
+
+    private fun addMessage(message: String, key: String, latitude: Double, longitude: Double) {
+        val id = UUID.randomUUID().toString();
+        val encryptedMessage = encryptMessage(message, key)
+
+        val doc = hashMapOf(
+            "id" to id,
+            "encrypted_msg" to encryptedMessage,
+            "latitude" to latitude,
+            "longitude" to longitude,
+        )
+        db.collection("messages").add(doc)
+    }
+
+    private fun retrieveMessage(key: String, latitude: Double, longitude: Double) {
+        TODO()
+    }
+
+    private fun encryptMessage(message: String, userKey: String): String {
+        AeadConfig.register()
+
+        val derivedKey =
+            MessageDigest.getInstance("SHA-256").digest(userKey.toByteArray()).copyOf(32)
+
+        val keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withBytes(derivedKey))
+
+        val aead: Aead = keysetHandle.getPrimitive(Aead::class.java)
+
+        val ciphertext: ByteArray = aead.encrypt(message.toByteArray(), null)
+
+        return Base64.encodeToString(ciphertext, Base64.NO_WRAP)
+    }
+
+
+    fun decryptMessage(encryptedMessage: String, userKey: String): String {
+        val derivedKey =
+            MessageDigest.getInstance("SHA-256").digest(userKey.toByteArray()).copyOf(32)
+
+        val keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withBytes(derivedKey))
+        val aead: Aead = keysetHandle.getPrimitive(Aead::class.java)
+
+        val ciphertext: ByteArray = Base64.decode(encryptedMessage, Base64.NO_WRAP)
+
+        return String(aead.decrypt(ciphertext, null))
+    }
+
+
     private fun getUserLocation() {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
             .build()
@@ -89,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.lastLocation
-                if(location == null) {
+                if (location == null) {
                     Toast.makeText(
                         this@MainActivity,
                         "No available GPS data",
@@ -172,6 +231,15 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         }
+    }
+
+    private fun testEncryption() {
+        val enkriptovanaPoruka = encryptMessage("Fahret", "qwert678")
+        val dekriptovanaPoruka = decryptMessage(enkriptovanaPoruka, "qwert678")
+
+        Log.d("CRYPT: ", "Enkriptovana poruka: $enkriptovanaPoruka")
+        Log.d("CRYPT: ", "Dekriptovana poruka: $dekriptovanaPoruka")
+
     }
 
     override fun onPause() {

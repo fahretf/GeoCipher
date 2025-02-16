@@ -12,6 +12,7 @@ constraintlayout = "2.2.0"
 playServicesLocation = "21.3.0"
 firebase-bom = "33.9.0"
 google-services = "4.4.2"
+tink = "1.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26,6 +27,7 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
+tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
