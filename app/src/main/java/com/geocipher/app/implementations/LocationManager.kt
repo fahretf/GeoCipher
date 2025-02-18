@@ -4,9 +4,13 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Looper
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity.LOCATION_SERVICE
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.geocipher.app.interfaces.ILocationManager
 import com.geocipher.app.interfaces.LocationUpdateListener
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -21,6 +25,10 @@ private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
 class LocationManager(private val context: Context) : ILocationManager {
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    init {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    }
 
 
     override fun getUserLocation(activity: Activity, listener: LocationUpdateListener) {
@@ -81,6 +89,36 @@ class LocationManager(private val context: Context) : ILocationManager {
     }
 
     override fun checkLocationPermission(): Boolean {
-        TODO("Not yet implemented")
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun checkGPSEnabled(): Boolean {
+        val systemLocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return systemLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    }
+
+    fun startLocationTracking(activity: Activity, listener: LocationUpdateListener) {
+        if (!checkLocationPermission()) {
+            requestLocationPermission(activity)
+            return
+        }
+
+        if (!checkGPSEnabled()) {
+            Toast.makeText(
+                context,
+                "You need to turn on Location services for this app to work.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        getUserLocation(activity, listener)
     }
 }
