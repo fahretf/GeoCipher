@@ -36,7 +36,6 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 class MainActivity : AppCompatActivity(), LocationUpdateListener {
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private lateinit var textViewLat: TextView
     private lateinit var textViewLong: TextView
@@ -76,6 +75,8 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
         testEncryption()
 
     }
+
+
 
     private fun testFirestoreConnection() {
         val testDoc = hashMapOf(
@@ -267,11 +268,14 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
     }
 
     override fun onLocationUpdated(latitude: Double, longitude: Double) {
-        TODO("Not yet implemented")
+        textViewLat.text = latitude.toString()
+        textViewLong.text = longitude.toString()
     }
 
     override fun onLocationError(error: String) {
-        TODO("Not yet implemented")
+        Toast
+            .makeText(this, error, Toast.LENGTH_LONG)
+            .show()
     }
 
 }
