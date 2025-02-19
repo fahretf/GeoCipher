@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
         Log.i("MainActivity", "Enkriptovana: $enkriptovana")
         Log.i("MainActivity", "Dekriptovana: $dekriptovana")
 
+        locationManager.startLocationTracking(this, this)
+
     }
 
     override fun onLocationUpdated(latitude: Double, longitude: Double) {

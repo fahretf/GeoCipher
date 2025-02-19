@@ -38,11 +38,9 @@ class LocationManager(private val context: Context) : ILocationManager {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.lastLocation
                 if (location == null) {
-                    Toast.makeText(
-                        context,
-                        "No available GPS data",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    listener.onLocationError("No available GPS data")
+                } else {
+                    listener.onLocationUpdated(location.latitude, location.longitude)
                 }
             }
         }
