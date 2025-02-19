@@ -5,6 +5,6 @@ import com.google.firebase.firestore.DocumentReference
 
 interface IMessageRepository {
     fun addMessage(encryptedMessage: String, key: String, latitude: Double, longitude: Double)
-    fun retrieveMessage(key: String, latitude: Double, longitude: Double)
+    fun retrieveMessage(latitude: Double, longitude: Double)
     fun testConnection(): Task<DocumentReference>
 }
