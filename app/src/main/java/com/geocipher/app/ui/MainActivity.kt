@@ -51,6 +51,14 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
         Log.i("MainActivity", "Dekriptovana: $dekriptovana")
 
         locationManager.startLocationTracking(this, this)
+        messageRepository.testConnection().addOnSuccessListener { documentReference ->
+
+            Log.d("MainActivity", "Success: ${documentReference.id}")
+            Toast.makeText(this, "Success!", Toast.LENGTH_LONG).show()
+
+        }.addOnFailureListener { something ->
+            Log.e("MainActivity", "Error: ${something.message}")
+        Toast.makeText(this, "Failed: ${something.message}", Toast.LENGTH_LONG).show()}
 
     }
 
