@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,26 +8,162 @@
     android:background="@drawable/gradient_background"
     tools:context=".ui.MainActivity">
 
-
-
-    <TextView
-        android:id="@+id/latitude"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/location_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"
+        android:layout_marginTop="50dp"
+        android:layout_marginHorizontal="24dp"
+        android:padding="16dp"
+        android:background="#1A000000"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <TextView
-        android:id="@+id/longitude"
-        android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$ geocipher location"
+            android:textColor="#64DD17"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="> lat: "
+                    android:textColor="#B0BEC5"
+                    android:fontFamily="monospace"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/latitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0.0000"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="monospace"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="> long: "
+                    android:textColor="#B0BEC5"
+                    android:fontFamily="monospace"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/longitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0.0000"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="monospace"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="@+id/latitude"
-        app:layout_constraintTop_toBottomOf="@+id/latitude" />
+        android:orientation="vertical"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="24dp"
+        android:padding="16dp"
+        android:background="#1A000000"
+        app:layout_constraintTop_toBottomOf="@id/location_container">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$ compose message"
+            android:textColor="#64DD17"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/message_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter your message"
+            android:textColorHint="#4DB0BEC5"
+            android:textColor="#FFFFFF"
+            android:fontFamily="monospace"
+            android:background="@null"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$ enter key"
+            android:textColor="#64DD17"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/key_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter encryption key"
+            android:textColorHint="#4DB0BEC5"
+            android:textColor="#FFFFFF"
+            android:fontFamily="monospace"
+            android:background="@null"
+            android:padding="8dp"
+            android:inputType="textPassword"
+            android:layout_marginBottom="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/upload_button"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/upload_button_background"
+                android:fontFamily="monospace"
+                android:paddingHorizontal="16dp"
+                android:text="UPLOAD"
+                android:textColor="#FFFFFF" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/view_messages_button"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="VIEW MESSAGES"
+                android:textColor="#FFFFFF"
+                android:fontFamily="monospace"
+                android:background="@drawable/view_messages_button_background"
+                android:paddingHorizontal="16dp"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
