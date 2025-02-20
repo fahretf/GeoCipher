@@ -15,11 +15,14 @@ import com.geocipher.app.managers.EncryptionManagerSingleton
 import com.geocipher.app.managers.LocationManagerSingleton
 import com.geocipher.app.managers.MessageRepositorySingleton
 import android.content.Intent
+import android.widget.EditText
 
 class MainActivity : AppCompatActivity(), LocationUpdateListener {
 
     private lateinit var textViewLat: TextView
     private lateinit var textViewLong: TextView
+    private lateinit var messageInput: EditText
+    private lateinit var keyInput: EditText
     private lateinit var uploadButton: Button
     private lateinit var viewMessagesButton : Button
     private val locationManager by lazy { LocationManagerSingleton.getInstance(this) }
@@ -36,11 +39,13 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
             insets
         }
 
-        findViewById<Button?>(R.id.upload_button).setOnClickListener(buttonUpload())
+        findViewById<Button>(R.id.upload_button).setOnClickListener { buttonUpload() }
         findViewById<Button>(R.id.view_messages_button).setOnClickListener { buttonViewMessages() }
         viewMessagesButton = findViewById(R.id.view_messages_button)
         textViewLat = findViewById(R.id.latitude)
         textViewLong = findViewById(R.id.longitude)
+        messageInput = findViewById(R.id.message_input)
+        keyInput = findViewById(R.id.key_input)
 
         locationManager.startLocationTracking(this, this)
 
@@ -52,8 +57,25 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
         startActivity(intent)
     }
 
-    private fun buttonUpload(): View.OnClickListener? {
-        TODO("Not yet implemented")
+    private fun buttonUpload() {
+        messageRepository.addMessage(
+            encryptionManager.encryptMessage(
+                messageInput.text.toString(),
+                keyInput.text.toString()
+            ),
+            keyInput.text.toString(),
+            textViewLat.text.toString().toDouble(),
+            textViewLong.text.toString().toDouble()
+
+        ).addOnSuccessListener {
+            Toast.makeText(this,
+                "Successfully uploaded the message!",
+                Toast.LENGTH_LONG).show()
+        }.addOnFailureListener {
+            Toast.makeText(this,
+                "Your message didn't get uploaded due to an error.",
+                Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onLocationUpdated(latitude: Double, longitude: Double) {
