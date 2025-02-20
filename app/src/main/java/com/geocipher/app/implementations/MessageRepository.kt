@@ -17,7 +17,7 @@ class MessageRepository : IMessageRepository {
         db = FirebaseFirestore.getInstance()
     }
 
-    override fun addMessage(encryptedMessage: String, key: String, latitude: Double, longitude: Double) {
+    override fun addMessage(encryptedMessage: String, key: String, latitude: Double, longitude: Double): Task<DocumentReference> {
         val id = UUID.randomUUID().toString();
         val doc = hashMapOf(
             "id" to id,
