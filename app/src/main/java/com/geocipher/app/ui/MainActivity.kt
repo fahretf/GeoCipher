@@ -14,6 +14,7 @@ import com.geocipher.app.interfaces.LocationUpdateListener
 import com.geocipher.app.managers.EncryptionManagerSingleton
 import com.geocipher.app.managers.LocationManagerSingleton
 import com.geocipher.app.managers.MessageRepositorySingleton
+import android.content.Intent
 
 class MainActivity : AppCompatActivity(), LocationUpdateListener {
 
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
         }
 
         findViewById<Button?>(R.id.upload_button).setOnClickListener(buttonUpload())
-        findViewById<Button?>(R.id.view_messages_button).setOnClickListener(buttonViewMessages())
+        findViewById<Button>(R.id.view_messages_button).setOnClickListener { buttonViewMessages() }
         viewMessagesButton = findViewById(R.id.view_messages_button)
         textViewLat = findViewById(R.id.latitude)
         textViewLong = findViewById(R.id.longitude)
@@ -46,9 +47,9 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
 
     }
 
-    private fun buttonViewMessages(): View.OnClickListener? {
-        TODO("Not yet implemented")
-
+    private fun buttonViewMessages() {
+        val intent = Intent(this, MessageDiscoveryActivity::class.java)
+        startActivity(intent)
     }
 
     private fun buttonUpload(): View.OnClickListener? {
