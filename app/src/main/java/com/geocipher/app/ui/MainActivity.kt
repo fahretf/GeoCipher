@@ -15,11 +15,14 @@ import com.geocipher.app.managers.EncryptionManagerSingleton
 import com.geocipher.app.managers.LocationManagerSingleton
 import com.geocipher.app.managers.MessageRepositorySingleton
 import android.content.Intent
+import android.widget.EditText
 
 class MainActivity : AppCompatActivity(), LocationUpdateListener {
 
     private lateinit var textViewLat: TextView
     private lateinit var textViewLong: TextView
+    private lateinit var messageInput: EditText
+    private lateinit var keyInput: EditText
     private lateinit var uploadButton: Button
     private lateinit var viewMessagesButton : Button
     private val locationManager by lazy { LocationManagerSingleton.getInstance(this) }
@@ -53,7 +56,13 @@ class MainActivity : AppCompatActivity(), LocationUpdateListener {
     }
 
     private fun buttonUpload(): View.OnClickListener? {
-        TODO("Not yet implemented")
+        messageRepository.addMessage(
+            encryptionManager.encryptMessage(
+                messageInput.text,
+                keyInput.text
+            ),
+
+        )
     }
 
     override fun onLocationUpdated(latitude: Double, longitude: Double) {
