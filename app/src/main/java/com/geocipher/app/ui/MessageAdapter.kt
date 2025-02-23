@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.geocipher.app.R
 import com.geocipher.app.models.Message
 
-class MessageAdapter : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
-
+class MessageAdapter(private val onMessageClick: (Message) -> Unit) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
     private val messages = mutableListOf<Message>()
 
     class MessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -29,6 +28,9 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() 
         holder.messageNumber.text = "Message #${position + 1}"
         holder.encrypted_text.text = message.encryptedMessage
         holder.timestamp.text = message.timestamp.toDate().toString()
+        holder.itemView.setOnClickListener {
+            onMessageClick(message)
+        }
     }
 
     override fun getItemCount() = messages.size
