@@ -1,4 +1,4 @@
-GeoCipher
+# GeoCipher
 
 GeoCipher is a location based encrypted messaging app that allows users to drop and retrieve secret messages at real-world GPS coordinates. Messages are encrypted using AES-GCM and can only be unlocked by users who visit the exact location and enter the correct decryption key.
 Status
