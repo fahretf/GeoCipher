@@ -6,6 +6,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import java.util.Date
 import java.util.UUID
 
@@ -26,11 +27,11 @@ class MessageRepository : IMessageRepository {
             "longitude" to longitude,
             "timestamp" to Timestamp(Date())
         )
-        db.collection("messages").add(doc)
+        return db.collection("messages").add(doc)
     }
 
-    override fun retrieveMessage(latitude: Double, longitude: Double) {
-        db.collection("messages")
+    override fun retrieveMessage(latitude: Double, longitude: Double): Task<QuerySnapshot> {
+       return db.collection("messages")
             .whereLessThanOrEqualTo("latitude", latitude + COORDINATE_RANGE)
             .whereLessThanOrEqualTo("longitude", longitude + COORDINATE_RANGE)
             .whereGreaterThanOrEqualTo("latitude", latitude - COORDINATE_RANGE)
